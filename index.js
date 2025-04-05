@@ -47,13 +47,21 @@ app.post("/signin", (req,res)=>{
     }
 })
 
-app.get("/me", function(req,res){
+function auth(req,res,next){
+     const token = req.headers.token;
+     const decode = jwt.verify(token , JWT_SECRET);
 
-    const token = req.headers.token ;
-
-    const decode = jwt.verify(token,JWT_SECRET);
-
-    if(decode.username){
+     if(decode.username){
+        next()
+     }
+     else{
+        res.json({
+            message: "Invalid token"
+        })
+     }
+}
+app.get("/me",auth, function(req,res){
+     
          let foundUser = null;
 
          for(let i =0;i<users.length;i++){
@@ -66,5 +74,6 @@ app.get("/me", function(req,res){
             username: foundUser.username
          })
     }
-})
+
+) 
 app.listen(6000)
