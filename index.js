@@ -18,7 +18,7 @@ app.post("/signup", function(req,res){
        Message: "User created successfully"    
     })
 })
-
+ 
 app.post("/signin", (req,res)=>{
     const username = req.body.username;
     const password = req.body.password;
@@ -49,5 +49,22 @@ app.post("/signin", (req,res)=>{
 
 app.get("/me", function(req,res){
 
+    const token = req.headers.token ;
+
+    const decode = jwt.verify(token,JWT_SECRET);
+
+    if(decode.username){
+         let foundUser = null;
+
+         for(let i =0;i<users.length;i++){
+            if(users[i].username==decode.username){
+                foundUser = users[i];
+            }
+         }
+
+         res.json({
+            username: foundUser.username
+         })
+    }
 })
 app.listen(6000)
