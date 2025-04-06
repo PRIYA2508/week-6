@@ -6,6 +6,11 @@ const app = express();
 //add middleware 
 app.use(express.json())
 const users = [];
+
+function login(req,res,next){
+    console.log(req.method + " req came");
+    next();
+}
 app.post("/signup", function(req,res){
     const username = req.body.username;
     const password = req.body.password;
@@ -19,7 +24,7 @@ app.post("/signup", function(req,res){
     })
 })
  
-app.post("/signin", (req,res)=>{
+app.post("/signin",login, (req,res)=>{
     const username = req.body.username;
     const password = req.body.password;
     
@@ -52,6 +57,7 @@ function auth(req,res,next){
      const decode = jwt.verify(token , JWT_SECRET);
 
      if(decode.username){
+        req.username = decode.username;
         next()
      }
      else{
@@ -60,12 +66,12 @@ function auth(req,res,next){
         })
      }
 }
-app.get("/me",auth, function(req,res){
-     
+app.get("/me",login,auth, function(req,res){
+
          let foundUser = null;
 
          for(let i =0;i<users.length;i++){
-            if(users[i].username==decode.username){
+            if(users[i].username==req.username){
                 foundUser = users[i];
             }
          }
